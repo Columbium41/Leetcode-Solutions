@@ -1,5 +1,7 @@
 package medium;
 
+import utils.Edge;
+
 import java.util.*;
 
 // accepted: 5.95% time and 5.51% memory
@@ -8,45 +10,20 @@ public class q2976 {
     // idea: find and memoize the cost of converting each individual character to the target character
     // and sum up the costs
 
-    public class Edge implements Comparable<Edge> {
-        public char d;
-        public int w;
-
-        public Edge(char d, int w) {
-            this.d = d;
-            this.w = w;
-        }
-
-        @Override
-        public int compareTo(Edge other) {
-            if (this.w > other.w) {
-                return 1;
-            } else if (this.w < other.w) {
-                return -1;
-            }
-            return 0;
-        }
-
-        @Override
-        public String toString() {
-            return "(" + this.d + "," + this.w + ")";
-        }
-    }
-
     public long minimumCost(String source, String target, char[] original, char[] changed, int[] cost) {
         long totalCost = 0;
         int n = source.length();
         HashMap<String, Integer> memo = new HashMap<>();
 
         // construct graph from arrays
-        HashMap<Character, ArrayList<Edge>> graph = new HashMap<>();
+        HashMap<Character, ArrayList<Edge<Character, Integer>>> graph = new HashMap<>();
         for (int i = 0; i < cost.length; i++) {
             char s = original[i];
             char d = changed[i];
             int w = cost[i];
 
             if (!graph.containsKey(s)) {
-                graph.put(s, new ArrayList<Edge>());
+                graph.put(s, new ArrayList<Edge<Character, Integer>>());
             }
 
             graph.get(s).add(new Edge(d, w));
@@ -82,22 +59,22 @@ public class q2976 {
         return totalCost;
     }
 
-    public int dijkstra(HashMap<Character, ArrayList<Edge>> graph, char s, char d, HashMap<String, Integer> memo) {
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
+    public int dijkstra(HashMap<Character, ArrayList<Edge<Character, Integer>>> graph, char s, char d, HashMap<String, Integer> memo) {
+        PriorityQueue<Edge<Character, Integer>> pq = new PriorityQueue<>();
         HashMap<Character, Integer> distances = new HashMap<>();
 
-        pq.add(new Edge(s, 0));
+        pq.add(new Edge<Character, Integer>(s, 0));
         distances.put(s, 0);
 
         while (!pq.isEmpty()) {
-            Edge curr = pq.poll();
+            Edge<Character, Integer> curr = pq.poll();
             int currDistance = distances.get(curr.d);
 
             if (!graph.containsKey(curr.d)) {
                 continue;
             }
 
-            for (Edge e : graph.get(curr.d)) {
+            for (Edge<Character, Integer> e : graph.get(curr.d)) {
                 char node = e.d;
                 int w = e.w;
 
