@@ -21,40 +21,28 @@ import java.util.*;
 public class q312 {
     public int maxCoins(int[] nums) {
         int n = nums.length;
-        int maxCoins = Integer.MIN_VALUE;
-        int[][] memo = new int[n][n];  // max coins you can get from [i..j] in nums
 
-        return recurse(nums, 0, n - 1, memo);
-    }
+        int[] arr = new int[n + 2];
+        arr[0] = 1;
+        arr[n + 1] = 1;
 
-    public int recurse(int[] nums, int l, int r, int[][] memo) {
-        // System.out.println("l: " + l + ", r: " + r);
-        int n = nums.length;
-        int maxScore = Integer.MIN_VALUE;
-
-        // base case
-        if (l > r)
-            return 0;
-
-        if (memo[l][r] != 0)
-            return memo[l][r];
-
-        // nums[i] is the last balloon to be popped in nums[l..r]
-        for (int i = l; i <= r; i++) {
-            int popped = nums[i];
-            if (l > 0)
-                popped *= nums[l - 1];
-            if (r < n - 1)
-                popped *= nums[r + 1];
-
-            maxScore = Math.max(maxScore,
-                    recurse(nums, l, i - 1, memo) +
-                            popped +
-                            recurse(nums, i + 1, r, memo)
-            );
+        for (int i = 1; i <= n; i++) {
+            arr[i] = nums[i - 1];
         }
 
-        memo[l][r] = maxScore;
-        return maxScore;
+        int[][] dp = new int[n + 2][n + 2];
+
+        for (int i = 1; i <= n; i++)
+            dp[i][i] = arr[i - 1] * arr[i] * arr[i + 1];
+
+        for (int i = n; i >= 1; i--) {
+            for (int j = i + 1; j <= n; j++) {
+                for (int k = i; k <= j; k++) {
+                    dp[i][j] = Math.max(dp[i][j], arr[i - 1] * arr[k] * arr[j + 1] + dp[i][k - 1] + dp[k + 1][j]);
+                }
+            }
+        }
+
+        return dp[1][n];
     }
 }
